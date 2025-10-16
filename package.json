@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "dev:debug": "LOG_LEVEL=debug nodemon server.js",
+    "dev:http": "LOG_LEVEL=http nodemon server.js",
     "test": "jest"
   },
   "dependencies": {
@@ -14,7 +16,9 @@
     "cors": "^2.8.5",
     "socket.io": "^4.7.2",
     "bull": "^4.11.4",
-    "redis": "^4.6.8"
+    "redis": "^4.6.8",
+    "winston": "^3.11.0",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

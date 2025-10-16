@@ -133,6 +133,8 @@ WebSocket connections provide live updates:
 | `FILE_RETENTION_HOURS` | `24` | File cleanup interval |
 | `FFMPEG_THREADS` | `4` | FFmpeg thread count |
 | `MAX_CONCURRENT_JOBS` | `3` | Concurrent processing limit |
+| `LOG_LEVEL` | `info` | Logging level (error, warn, info, http, debug) |
+| `LOG_DIR` | `logs` | Directory for log files |
 
 ### Kubernetes Configuration
 
@@ -145,15 +147,64 @@ data:
   MAX_CONCURRENT_JOBS: "5"     # 5 concurrent jobs
 ```
 
-## 📊 Monitoring
+## 📊 Monitoring & Logging
 
 ### Health Checks
 - **Endpoint**: `/health`
 - **Kubernetes**: Liveness and readiness probes configured
 - **Metrics**: Prometheus metrics available at `/metrics`
 
+### Logging
+
+The application uses Winston for structured logging with configurable log levels:
+
+**Log Levels** (from highest to lowest priority):
+- `error` - Error messages only
+- `warn` - Warnings and errors
+- `info` - General information (default)
+- `http` - HTTP request logs
+- `debug` - Detailed debug information
+
+**Enable Debug Logging:**
+```bash
+# Environment variable
+export LOG_LEVEL=debug
+
+# Docker
+docker run -e LOG_LEVEL=debug ...
+
+# Kubernetes (update configmap)
+kubectl set env deployment/gopro-processor LOG_LEVEL=debug -n gopro-processor
+```
+
+**Log Output:**
+- Console: Colored, human-readable format
+- `logs/combined.log`: All logs in JSON format (rotated at 10MB, keeps 5 files)
+- `logs/error.log`: Error logs only in JSON format (rotated at 10MB, keeps 5 files)
+
+**Debug logging includes:**
+- File upload details (names, sizes, types)
+- GoPro file parsing and grouping
+- FFmpeg command execution and output
+- Job queue status and progress
+- WebSocket connections and events
+- API request/response details
+
+**View Logs:**
+```bash
+# Local development
+tail -f logs/combined.log | npx pino-pretty
+
+# Kubernetes
+kubectl logs -f deployment/gopro-processor -n gopro-processor
+
+# With label selector
+kubectl logs -f -l app=gopro-processor -n gopro-processor
+```
+
 ### Observability
-- **Logs**: Structured JSON logging
+- **Logs**: Structured JSON logging with Winston
+- **HTTP Logging**: Morgan middleware for request logging
 - **Metrics**: Request rates, processing times, queue depths
 - **Dashboards**: Grafana dashboard included
 - **Alerts**: CPU, memory, and error rate monitoring
@@ -302,8 +353,18 @@ kubectl exec -it deployment/gopro-processor -n gopro-processor -- \
 
 ### Logs Analysis
 ```bash
-# Application logs
+# Application logs (info level)
 kubectl logs -f deployment/gopro-processor -n gopro-processor
+
+# Enable debug logging temporarily
+kubectl set env deployment/gopro-processor LOG_LEVEL=debug -n gopro-processor
+kubectl logs -f deployment/gopro-processor -n gopro-processor
+
+# Filter for errors only
+kubectl logs deployment/gopro-processor -n gopro-processor | grep -i error
+
+# Export logs to file
+kubectl logs deployment/gopro-processor -n gopro-processor > gopro-logs.txt
 
 # Redis logs  
 kubectl logs -f deployment/redis -n gopro-processor
