@@ -1,0 +1,31 @@
+file,type,description
+server.js,Backend,"Main Node.js Express server with video processing, WebSocket support, and API endpoints"
+package.json,Backend,"Backend dependencies and scripts including Express, Multer, Socket.io, Bull, Redis"
+frontend/src/App.js,Frontend,"Main React component with drag-drop upload, real-time progress, and download management"
+frontend/src/App.css,Frontend,Comprehensive styling with GoPro-inspired design and responsive layout
+frontend/src/index.js,Frontend,React application entry point
+frontend/src/index.css,Frontend,Base CSS styles
+frontend/package.json,Frontend,"Frontend dependencies including React, Socket.io client"
+frontend/public/index.html,Frontend,HTML template for React application
+Dockerfile,Container,"Multi-stage Docker build with Node.js, React build, and FFmpeg integration"
+.dockerignore,Container,Docker build context exclusions for optimized builds
+docker-compose.yml,Container,Local development environment with Redis and optional Nginx
+k8s/namespace.yaml,Kubernetes,Namespace definition for application isolation
+k8s/configmap.yaml,Kubernetes,Configuration data for environment variables
+k8s/secret.yaml,Kubernetes,Secrets template for sensitive data
+k8s/persistent-volume.yaml,Kubernetes,Storage configuration for video processing workspace
+k8s/rbac.yaml,Kubernetes,ServiceAccount and RBAC permissions
+k8s/redis.yaml,Kubernetes,Redis deployment and service for job queue backend
+k8s/deployment.yaml,Kubernetes,Main application deployment with scaling and resource limits
+k8s/service.yaml,Kubernetes,Kubernetes services for load balancing and service discovery
+k8s/ingress.yaml,Kubernetes,Ingress configuration for gopro.zephryn.io with TLS and large file support
+k8s/hpa.yaml,Kubernetes,Horizontal Pod Autoscaler for automatic scaling based on CPU/memory
+k8s/network-policy.yaml,Kubernetes,Network security policies for pod-to-pod communication
+k8s/poddisruptionbudget.yaml,Kubernetes,Pod disruption budget for high availability during updates
+k8s/monitoring.yaml,Kubernetes,Prometheus ServiceMonitor and Grafana dashboard for observability
+k8s/kustomization.yaml,Kubernetes,Kustomize configuration for streamlined deployments
+deploy.sh,Deployment,Automated deployment script with Docker build and Kubernetes apply
+cleanup.sh,Deployment,Complete cleanup script for removing all resources
+nginx.conf,Configuration,Nginx reverse proxy configuration for local testing
+.env.example,Configuration,Environment variables template with all configuration options
+README.md,Documentation,"Comprehensive documentation with architecture, deployment, and troubleshooting"

@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: gopro-processor-pdb
+  namespace: gopro-processor
+  labels:
+    app.kubernetes.io/name: gopro-video-processor
+    app.kubernetes.io/component: disruption-budget
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gopro-video-processor
+      app.kubernetes.io/component: application
+---

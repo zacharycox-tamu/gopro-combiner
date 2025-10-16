@@ -1,0 +1,95 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: gopro-processor-metrics
+  namespace: gopro-processor
+  labels:
+    app.kubernetes.io/name: gopro-video-processor
+    app.kubernetes.io/component: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gopro-video-processor
+      app.kubernetes.io/component: service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+  namespaceSelector:
+    matchNames:
+    - gopro-processor
+---
+# Grafana Dashboard ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gopro-processor-dashboard
+  namespace: gopro-processor
+  labels:
+    app.kubernetes.io/name: gopro-video-processor
+    app.kubernetes.io/component: monitoring
+    grafana_dashboard: "1"
+data:
+  dashboard.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "GoPro Video Processor",
+        "description": "Monitoring dashboard for GoPro Video Processor application",
+        "tags": ["gopro", "video", "processing"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "title": "Request Rate",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(http_requests_total{service=\"gopro-processor-service\"}[5m])",
+                "legendFormat": "{{method}} {{status}}"
+              }
+            ]
+          },
+          {
+            "title": "Processing Queue Length", 
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "bull_queue_waiting{queue=\"video processing\"}",
+                "legendFormat": "Waiting Jobs"
+              },
+              {
+                "expr": "bull_queue_active{queue=\"video processing\"}",
+                "legendFormat": "Active Jobs"
+              }
+            ]
+          },
+          {
+            "title": "CPU Usage",
+            "type": "graph", 
+            "targets": [
+              {
+                "expr": "rate(container_cpu_usage_seconds_total{pod=~\"gopro-processor-.*\"}[5m])",
+                "legendFormat": "{{pod}}"
+              }
+            ]
+          },
+          {
+            "title": "Memory Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "container_memory_usage_bytes{pod=~\"gopro-processor-.*\"}",
+                "legendFormat": "{{pod}}"
+              }
+            ]
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "10s"
+      }
+    }
+---
